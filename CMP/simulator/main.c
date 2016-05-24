@@ -1,8 +1,12 @@
 #include <stdio.h>
 #include <string.h>
 #include "function.h"
+#include "Memory.h"
 
-
+FILE *iimage;
+FILE *dimage;
+FILE *snapshot;
+FILE *report;
 
 
 int reg[32];
@@ -16,12 +20,13 @@ int temp;
 
 int main(void)
 {
-    FILE *iimage = fopen("./iimage.bin","rb");
-    FILE *dimage = fopen("./dimage.bin","rb");
-    FILE *snapshot = fopen("./snapshot.rpt","w");
+    iimage = fopen("./iimage.bin","rb");
+    dimage = fopen("./dimage.bin","rb");
+    snapshot = fopen("./snapshot.rpt","w");
+    report = fopen("./report.rpt","w");
 
-
-
+    initICMP();
+    initDCMP();
 
     int sdata=0,sins=0;
     int i,j;
@@ -122,12 +127,11 @@ int main(void)
         }
         fprintf(snapshot,"PC: 0x%08X\n",PC);
 
-
+        checkImemory(PC);
 
         if(PC>=PC_start)
         {
             op=(unsigned)iim[i]>>26;
-
 
 
 
@@ -319,6 +323,7 @@ int main(void)
                 immediate=cut_immediate(iim[i]);
 
                 read= reg[rs]+immediate;
+                checkDmemory(read);
                 reg[rt]=(int)combine(dim[read],dim[read+1],dim[read+2],dim[read+3]);
 
                 if(rt==0) reg[rt]=0;
@@ -334,6 +339,7 @@ int main(void)
                 immediate=cut_immediate(iim[i]);
 
                 read= reg[rs]+immediate;
+                checkDmemory(read);
                 reg[rt]=(short)combine_two(dim[read],dim[read+1]);
                 if(rt==0) reg[rt]=0;
 
@@ -347,6 +353,7 @@ int main(void)
                 immediate=cut_immediate(iim[i]);
 
                 read= reg[rs]+immediate;
+                checkDmemory(read);
                 reg[rt]=combine_two(dim[read],dim[read+1]);
                 if(rt==0) reg[rt]=0;
 
@@ -360,6 +367,7 @@ int main(void)
                 immediate=cut_immediate(iim[i]);
 
                 read= reg[rs]+immediate;
+                checkDmemory(read);
                 reg[rt]=(char)dim[read];
                 if(rt==0) reg[rt]=0;
 
@@ -373,7 +381,7 @@ int main(void)
                 immediate=cut_immediate(iim[i]);
 
                 read= reg[rs]+immediate;
-
+                checkDmemory(read);
                 reg[rt]=(unsigned)dim[read];
                 if(rt==0) reg[rt]=0;
 
@@ -388,6 +396,7 @@ int main(void)
 
                 getting=seperate(reg[rt]);
                 read= reg[rs]+immediate;
+                checkDmemory(read);
 
                 dim[read]=getting[0];
                 dim[read+1]=getting[1];
@@ -405,6 +414,7 @@ int main(void)
 
                 getting=seperate_two(reg[rt]);
                 read= reg[rs]+immediate;
+                checkDmemory(read);
                 dim[read]=getting[0];
                 dim[read+1]=getting[1];
                 PC+=4;
@@ -418,6 +428,7 @@ int main(void)
 
                 getting[0]=(unsigned char)(reg[rt]&0x000000FF);
                 read= reg[rs]+immediate;
+                checkDmemory(read);
                 dim[read]=getting[0];
                 PC+=4;
                 break;

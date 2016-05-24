@@ -1,5 +1,5 @@
 #include "function.h"
-#include <stdlib.h>
+
 
 int overflow_detect(int ans,int a,int b)
 {
