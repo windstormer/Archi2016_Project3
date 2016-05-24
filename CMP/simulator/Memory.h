@@ -6,5 +6,5 @@ void checkImemory(int VA);
 void initICMP();
 void initDCMP();
 
-extern FILE * report;
+extern int cycle;
 

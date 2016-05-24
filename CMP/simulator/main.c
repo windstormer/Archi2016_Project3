@@ -8,7 +8,7 @@ FILE *dimage;
 FILE *snapshot;
 FILE *report;
 
-
+int cycle;
 int reg[32];
 int PC;
 int PC_start;
@@ -17,6 +17,11 @@ unsigned char di[1024];
 int iim[256];
 unsigned char dim[1024];
 int temp;
+
+extern int iTLBmiss;
+extern int iTLBhit;
+extern int iPTmiss;
+extern int iPThit;
 
 int main(void)
 {
@@ -112,7 +117,7 @@ int main(void)
     int flag=0;
 
     i=0;
-    int cycle=0;
+    cycle=0;
     while(1)
     {
         memset(errors,0,sizeof(errors));
@@ -571,8 +576,13 @@ int main(void)
 
         fprintf(snapshot,"\n\n");
 
-
+        if(flag==1) break;
     }
+
+    fprintf(report,"ITLB :\n");
+    fprintf(report,"# hits: %d\n# misses: %d\n\n",iTLBhit,iTLBmiss);
+    fprintf(report,"IPageTable :\n");
+    fprintf(report,"# hits: %d\n# misses: %d\n\n",iPThit,iPTmiss);
 
     return 0;
 }
