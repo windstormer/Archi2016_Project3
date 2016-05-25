@@ -120,7 +120,7 @@ int findIPT(int VPN)
 
 void IPTmiss(int VPN)
 {
-    int i;
+    int i,j;
     /////////////////SWAP////////////////////
     int PPN=0;
     int min=0x7FFFFFFF;
@@ -170,18 +170,20 @@ void IPTmiss(int VPN)
                 ITLB[i].valid=0;
             }
         }
-
-        int PA = PPN * Ipage_size + 0;
-        int PAB = PA / Iblock_size;
-        int index = PAB % ICA_entries;
-        int tag = PA / Iblock_size / ICA_entries;
-
-        for(i=0; i<ICA_entries; i++)
+        for(j=0; j<Dpage_size; j+=4)
         {
-            if(ICA[index][i].tag==tag)
+            int PA = PPN * Ipage_size + j;
+            int PAB = PA / Iblock_size;
+            int index = PAB % ICA_entries;
+            int tag = PA / Iblock_size / ICA_entries;
+
+            for(i=0; i<ICA_entries; i++)
             {
-                ICA[index][i].valid=0;
-                ICA[index][i].MRU=0;
+                if(ICA[index][i].tag==tag)
+                {
+                    ICA[index][i].valid=0;
+                    ICA[index][i].MRU=0;
+                }
             }
         }
     }
@@ -437,7 +439,7 @@ int findDPT(int VPN)
 
 void DPTmiss(int VPN)
 {
-    int i;
+    int i,j;
     /////////////////SWAP////////////////////
     int PPN=0;
     int min=0x7FFFFFFF;
@@ -486,19 +488,23 @@ void DPTmiss(int VPN)
             }
         }
 
-        int PA = PPN * Dpage_size + 0;
-        int PAB = PA / Dblock_size;
-        int index = PAB % DCA_entries;
-        int tag = PA / Dblock_size / DCA_entries;
-
-        for(i=0; i<DCA_entries; i++)
+        for(j=0; j<Dpage_size; j+=4)
         {
-            if(DCA[index][i].tag==tag)
+            int PA = PPN * Dpage_size + j;
+            int PAB = PA / Dblock_size;
+            int index = PAB % DCA_entries;
+            int tag = PA / Dblock_size / DCA_entries;
+
+            for(i=0; i<DCA_entries; i++)
             {
-                DCA[index][i].valid=0;
-                DCA[index][i].MRU=0;
+                if(DCA[index][i].tag==tag)
+                {
+                    DCA[index][i].valid=0;
+                    DCA[index][i].MRU=0;
+                }
             }
         }
+
 
     }
 
