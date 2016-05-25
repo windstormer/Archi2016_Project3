@@ -22,6 +22,15 @@ extern int iTLBmiss;
 extern int iTLBhit;
 extern int iPTmiss;
 extern int iPThit;
+extern int iCAmiss;
+extern int iCAhit;
+
+extern int dTLBmiss;
+extern int dTLBhit;
+extern int dPTmiss;
+extern int dPThit;
+extern int dCAmiss;
+extern int dCAhit;
 
 int main(void)
 {
@@ -579,10 +588,18 @@ int main(void)
         if(flag==1) break;
     }
 
+    fprintf(report,"ICache :\n");
+    fprintf(report,"# hits: %d\n# misses: %d\n\n",iCAhit,iCAmiss);
+    fprintf(report,"DCache :\n");
+    fprintf(report,"# hits: %d\n# misses: %d\n\n",dCAhit,dCAmiss);
     fprintf(report,"ITLB :\n");
     fprintf(report,"# hits: %d\n# misses: %d\n\n",iTLBhit,iTLBmiss);
+    fprintf(report,"DTLB :\n");
+    fprintf(report,"# hits: %d\n# misses: %d\n\n",dTLBhit,dTLBmiss);
     fprintf(report,"IPageTable :\n");
     fprintf(report,"# hits: %d\n# misses: %d\n\n",iPThit,iPTmiss);
+    fprintf(report,"DPageTable :\n");
+    fprintf(report,"# hits: %d\n# misses: %d\n\n",dPThit,dPTmiss);
 
     return 0;
 }
