@@ -170,7 +170,7 @@ void IPTmiss(int VPN)
                 ITLB[i].valid=0;
             }
         }
-        for(j=0; j<Dpage_size; j+=4)
+        for(j=0; j<Ipage_size; j+=4)
         {
             int PA = PPN * Ipage_size + j;
             int PAB = PA / Iblock_size;
@@ -191,7 +191,7 @@ void IPTmiss(int VPN)
 
     ////////////////UPDATE TLB//////////////////
     min=0x7FFFFFFF;
-    int temp;
+    int temp=0;
     for(i=0; i<ITLB_entries; i++)
     {
         if(ITLB[i].valid==0)
@@ -515,7 +515,7 @@ void DPTmiss(int VPN)
 
     ////////////////UPDATE TLB//////////////////
     min=0x7FFFFFFF;
-    int temp;
+    int temp=0;
     for(i=0; i<DTLB_entries; i++)
     {
         if(DTLB[i].valid==0)
