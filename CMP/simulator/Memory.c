@@ -177,7 +177,7 @@ void IPTmiss(int VPN)
             int index = PAB % ICA_entries;
             int tag = PA / Iblock_size / ICA_entries;
 
-            for(i=0; i<ICA_entries; i++)
+            for(i=0; i<ICA_associate; i++)
             {
                 if(ICA[index][i].tag==tag)
                 {
@@ -257,6 +257,7 @@ int findICA(int PPN)
     {
         if(tag == ICA[index][i].tag && ICA[index][i].valid == 1)
         {
+            IMEM[PPN].last_cycle_used=cycle;
             ICA[index][i].MRU=1;
             return 1;
         }
@@ -461,11 +462,13 @@ void DPTmiss(int VPN)
             }
         }
     }
+
     DMEM[PPN].last_cycle_used=cycle;
     DMEM[PPN].valid=1;
     /////////////////UPDATE PT//////////////////
     if(flag==1)
     {
+
         DPT[VPN].PPN=PPN;
         DPT[VPN].valid=1;
     }
@@ -495,8 +498,9 @@ void DPTmiss(int VPN)
             int index = PAB % DCA_entries;
             int tag = PA / Dblock_size / DCA_entries;
 
-            for(i=0; i<DCA_entries; i++)
+            for(i=0; i<DCA_associate; i++)
             {
+
                 if(DCA[index][i].tag==tag)
                 {
                     DCA[index][i].valid=0;
@@ -577,6 +581,7 @@ int findDCA(int PPN)
     {
         if(tag == DCA[index][i].tag && DCA[index][i].valid == 1)
         {
+            DMEM[PPN].last_cycle_used=cycle;
             DCA[index][i].MRU=1;
             return 1;
         }
@@ -637,15 +642,17 @@ void DCAmiss(int PPN)
 void checkDmemory(int VA)
 {
     DVPN = VA / Dpage_size;
+
     DPageoffset = VA % Dpage_size;
     DPPN = findDTLB(DVPN);
+
 
     if(DPPN==-1)           ///TLB miss
     {
         dTLBmiss++;
         DPPN=findDPT(DVPN);
 
-        if(DPPN==-1)      ///PT miss
+       if(DPPN==-1)      ///PT miss
         {
             dPTmiss++;
             DPTmiss(DVPN);
