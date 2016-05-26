@@ -49,7 +49,7 @@ void initICMP()
 
     IPT_entries = Idisk_size/Ipage_size;
     ITLB_entries = IPT_entries/4;
-    ICA_entries = ICA_size/ICA_associate/4;
+    ICA_entries = ICA_size/ICA_associate/Iblock_size;
     IMEM_entries = IMEM_size/Ipage_size;
     ITLB = malloc(ITLB_entries * sizeof(TLB_block));
     IPT = malloc(IPT_entries * sizeof(PT_block));
@@ -113,7 +113,10 @@ int findITLB(int VPN)
 int findIPT(int VPN)
 {
     if(IPT[VPN].valid==1)
+    {
+        IMEM[IPT[VPN].PPN].last_cycle_used=cycle;
         return IPT[VPN].PPN;
+    }
     else
         return -1;
 }
@@ -144,7 +147,7 @@ void IPTmiss(int VPN)
     }
     IMEM[PPN].last_cycle_used=cycle;
     IMEM[PPN].valid=1;
-    /////////////////UPDATE PT//////////////////
+
 
     if(flag==1)
     {
@@ -165,17 +168,20 @@ void IPTmiss(int VPN)
 
         for(i=0; i<ITLB_entries; i++)
         {
-            if(ITLB[i].PPN==PPN)
+            if(ITLB[i].PPN==PPN )
             {
                 ITLB[i].valid=0;
             }
         }
+
+
+
         for(j=0; j<Ipage_size; j+=4)
         {
             int PA = PPN * Ipage_size + j;
             int PAB = PA / Iblock_size;
             int index = PAB % ICA_entries;
-            int tag = PA / Iblock_size / ICA_entries;
+            int tag = PAB / ICA_entries;
             if(ICA_associate==1)
             {
                 if(ICA[index][0].tag==tag)
@@ -188,7 +194,7 @@ void IPTmiss(int VPN)
             {
                 for(i=0; i<ICA_associate; i++)
                 {
-                    if(ICA[index][i].tag==tag)
+                    if(ICA[index][i].tag==tag && ICA[index][i].valid==1)
                     {
                         ICA[index][i].valid=0;
                         ICA[index][i].MRU=0;
@@ -200,7 +206,7 @@ void IPTmiss(int VPN)
     }
 
 
-    ////////////////UPDATE TLB//////////////////
+
     min=0x7FFFFFFF;
     int temp=0;
     for(i=0; i<ITLB_entries; i++)
@@ -224,6 +230,8 @@ void IPTmiss(int VPN)
     ITLB[temp].valid=1;
     ITLB[temp].PPN=PPN;
     ITLB[temp].VPN=VPN;
+
+
 
 }
 
@@ -262,7 +270,7 @@ int findICA(int PPN)
     int PA = PPN * Ipage_size + IPageoffset;
     int PAB = PA / Iblock_size;
     int index = PAB % ICA_entries;
-    int tag = PA / Iblock_size / ICA_entries;
+    int tag = PAB / ICA_entries;
     int flag=0;
     int put=0;
 
@@ -319,7 +327,7 @@ void ICAmiss(int PPN)
     int PA = PPN * Ipage_size + IPageoffset;
     int PAB = PA / Iblock_size;
     int index =PAB % ICA_entries;
-    int tag = PA / Iblock_size / ICA_entries;
+    int tag = PAB / ICA_entries;
     int flag=0;
     int put;
 
@@ -359,7 +367,8 @@ void ICAmiss(int PPN)
         ICA[index][put].tag=tag;
         ICA[index][put].valid=1;
     }
-    IMEM[PPN].last_cycle_used=cycle;
+   // IMEM[PPN].last_cycle_used=cycle;
+
 
 }
 
@@ -420,7 +429,7 @@ void initDCMP()
 
     DPT_entries = Ddisk_size/Dpage_size;
     DTLB_entries = DPT_entries/4;
-    DCA_entries = DCA_size/DCA_associate/4;
+    DCA_entries = DCA_size/DCA_associate/Dblock_size;
     DMEM_entries = DMEM_size/Dpage_size;
     DTLB = malloc(DTLB_entries * sizeof(TLB_block));
     DPT = malloc(DPT_entries * sizeof(PT_block));
@@ -481,7 +490,10 @@ int findDTLB(int VPN)
 int findDPT(int VPN)
 {
     if(DPT[VPN].valid==1)
+    {
+        DMEM[DPT[VPN].PPN].last_cycle_used=cycle;///here
         return DPT[VPN].PPN;
+    }
     else
         return -1;
 }
@@ -513,7 +525,7 @@ void DPTmiss(int VPN)
 
     DMEM[PPN].last_cycle_used=cycle;
     DMEM[PPN].valid=1;
-    /////////////////UPDATE PT//////////////////
+
     if(flag==1)
     {
 
@@ -531,6 +543,7 @@ void DPTmiss(int VPN)
         }
         DPT[VPN].PPN=PPN;
         DPT[VPN].valid=1;
+
         for(i=0; i<DTLB_entries; i++)
         {
             if(DTLB[i].PPN==PPN)
@@ -539,12 +552,14 @@ void DPTmiss(int VPN)
             }
         }
 
+
+
         for(j=0; j<Dpage_size; j+=4)
         {
             int PA = PPN * Dpage_size + j;
             int PAB = PA / Dblock_size;
             int index = PAB % DCA_entries;
-            int tag = PA / Dblock_size / DCA_entries;
+            int tag = PAB / DCA_entries;
             if(DCA_associate==1)
             {
                 if(DCA[index][0].tag==tag)
@@ -558,7 +573,7 @@ void DPTmiss(int VPN)
                 for(i=0; i<DCA_associate; i++)
                 {
 
-                    if(DCA[index][i].tag==tag)
+                    if(DCA[index][i].tag==tag && DCA[index][i].valid==1)
                     {
                         DCA[index][i].valid=0;
                         DCA[index][i].MRU=0;
@@ -571,7 +586,7 @@ void DPTmiss(int VPN)
     }
 
 
-    ////////////////UPDATE TLB//////////////////
+
     min=0x7FFFFFFF;
     int temp=0;
     for(i=0; i<DTLB_entries; i++)
@@ -595,6 +610,8 @@ void DPTmiss(int VPN)
     DTLB[temp].valid=1;
     DTLB[temp].PPN=PPN;
     DTLB[temp].VPN=VPN;
+
+
 
 }
 
@@ -633,7 +650,7 @@ int findDCA(int PPN)
     int PA = PPN * Dpage_size + DPageoffset;
     int PAB = PA / Dblock_size;
     int index = PAB % DCA_entries;
-    int tag = PA / Dblock_size / DCA_entries;
+    int tag = PAB / DCA_entries;
     int flag=0;
     int put;
     if(DCA_associate==1)
@@ -689,7 +706,7 @@ void DCAmiss(int PPN)
     int PA = PPN * Dpage_size + DPageoffset;
     int PAB = PA / Dblock_size;
     int index =PAB % DCA_entries;
-    int tag = PA / Dblock_size / DCA_entries;
+    int tag = PAB / DCA_entries;
     int flag=0;
     int put;
     if(DCA_associate==1)
@@ -729,7 +746,7 @@ void DCAmiss(int PPN)
         DCA[index][put].valid=1;
     }
 
-    DMEM[PPN].last_cycle_used=cycle;
+   // DMEM[PPN].last_cycle_used=cycle;
 
 }
 
