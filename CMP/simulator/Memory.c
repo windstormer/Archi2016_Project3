@@ -264,6 +264,7 @@ int findICA(int PPN)
     int index = PAB % ICA_entries;
     int tag = PA / Iblock_size / ICA_entries;
     int flag=0;
+    int put=0;
 
     if(ICA_associate==1)
     {
@@ -287,6 +288,7 @@ int findICA(int PPN)
 
                         if(flag==0)
                         {
+                            put =j;
                             flag=1;
                         }
                         else
@@ -296,7 +298,7 @@ int findICA(int PPN)
                         }
                     }
                 }
-                if(flag==1)
+                if(flag==1 && put == i)
                 {
                     for(j=0; j<ICA_associate; j++)
                     {
@@ -633,6 +635,7 @@ int findDCA(int PPN)
     int index = PAB % DCA_entries;
     int tag = PA / Dblock_size / DCA_entries;
     int flag=0;
+    int put;
     if(DCA_associate==1)
     {
         if(tag==DCA[index][0].tag&&DCA[index][0].valid==1)
@@ -655,6 +658,7 @@ int findDCA(int PPN)
 
                         if(flag==0)
                         {
+                            put = j;
                             flag=1;
                         }
                         else
@@ -664,7 +668,7 @@ int findDCA(int PPN)
                         }
                     }
                 }
-                if(flag==1)
+                if(flag==1 && put == i)
                 {
                     for(j=0; j<DCA_associate; j++)
                     {
