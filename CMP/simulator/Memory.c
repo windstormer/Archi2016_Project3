@@ -279,7 +279,6 @@ int findICA(int PPN)
         {
             if(tag == ICA[index][i].tag && ICA[index][i].valid == 1)
             {
-                IMEM[PPN].last_cycle_used=cycle;
                 for(j=0; j<ICA_associate; j++)
                 {
                     if(ICA[index][j].MRU==0 && j!=i)
@@ -649,7 +648,6 @@ int findDCA(int PPN)
         {
             if(tag == DCA[index][i].tag && DCA[index][i].valid == 1)
             {
-                DMEM[PPN].last_cycle_used=cycle;
                 for(j=0; j<DCA_associate; j++)
                 {
                     if(DCA[index][j].MRU==0 && j!=i)
