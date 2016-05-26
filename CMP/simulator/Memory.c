@@ -176,15 +176,26 @@ void IPTmiss(int VPN)
             int PAB = PA / Iblock_size;
             int index = PAB % ICA_entries;
             int tag = PA / Iblock_size / ICA_entries;
-
-            for(i=0; i<ICA_associate; i++)
+            if(ICA_associate==1)
             {
-                if(ICA[index][i].tag==tag)
+                if(ICA[index][0].tag==tag)
                 {
-                    ICA[index][i].valid=0;
-                    ICA[index][i].MRU=0;
+                    ICA[index][0].valid=0;
+                }
+
+            }
+            else
+            {
+                for(i=0; i<ICA_associate; i++)
+                {
+                    if(ICA[index][i].tag==tag)
+                    {
+                        ICA[index][i].valid=0;
+                        ICA[index][i].MRU=0;
+                    }
                 }
             }
+
         }
     }
 
@@ -247,19 +258,54 @@ void ITLBmiss(int VPN)
 }
 int findICA(int PPN)
 {
-    int i;
+    int i,j;
     int PA = PPN * Ipage_size + IPageoffset;
     int PAB = PA / Iblock_size;
     int index = PAB % ICA_entries;
     int tag = PA / Iblock_size / ICA_entries;
+    int flag=0;
 
-    for(i=0; i<ICA_associate; i++)
+    if(ICA_associate==1)
     {
-        if(tag == ICA[index][i].tag && ICA[index][i].valid == 1)
+        if(tag==ICA[index][0].tag&&ICA[index][0].valid==1)
         {
             IMEM[PPN].last_cycle_used=cycle;
-            ICA[index][i].MRU=1;
             return 1;
+        }
+    }
+    else
+    {
+        for(i=0; i<ICA_associate; i++)
+        {
+            if(tag == ICA[index][i].tag && ICA[index][i].valid == 1)
+            {
+                IMEM[PPN].last_cycle_used=cycle;
+                for(j=0; j<ICA_associate; j++)
+                {
+                    if(ICA[index][j].MRU==0 && j!=i)
+                    {
+
+                        if(flag==0)
+                        {
+                            flag=1;
+                        }
+                        else
+                        {
+                            flag=2;
+                            break;
+                        }
+                    }
+                }
+                if(flag==1)
+                {
+                    for(j=0; j<ICA_associate; j++)
+                    {
+                        ICA[index][j].MRU=0;
+                    }
+                }
+                ICA[index][i].MRU=1;
+                return 1;
+            }
         }
     }
     return -1;
@@ -497,14 +543,24 @@ void DPTmiss(int VPN)
             int PAB = PA / Dblock_size;
             int index = PAB % DCA_entries;
             int tag = PA / Dblock_size / DCA_entries;
-
-            for(i=0; i<DCA_associate; i++)
+            if(DCA_associate==1)
             {
-
-                if(DCA[index][i].tag==tag)
+                if(DCA[index][0].tag==tag)
                 {
-                    DCA[index][i].valid=0;
-                    DCA[index][i].MRU=0;
+                    DCA[index][0].valid=0;
+                }
+
+            }
+            else
+            {
+                for(i=0; i<DCA_associate; i++)
+                {
+
+                    if(DCA[index][i].tag==tag)
+                    {
+                        DCA[index][i].valid=0;
+                        DCA[index][i].MRU=0;
+                    }
                 }
             }
         }
@@ -571,19 +627,55 @@ void DTLBmiss(int VPN)
 }
 int findDCA(int PPN)
 {
-    int i;
+    int i,j;
     int PA = PPN * Dpage_size + DPageoffset;
     int PAB = PA / Dblock_size;
     int index = PAB % DCA_entries;
     int tag = PA / Dblock_size / DCA_entries;
-
-    for(i=0; i<DCA_associate; i++)
+    int flag=0;
+    if(DCA_associate==1)
     {
-        if(tag == DCA[index][i].tag && DCA[index][i].valid == 1)
+        if(tag==DCA[index][0].tag&&DCA[index][0].valid==1)
         {
             DMEM[PPN].last_cycle_used=cycle;
-            DCA[index][i].MRU=1;
             return 1;
+        }
+
+    }
+    else
+    {
+
+        for(i=0; i<DCA_associate; i++)
+        {
+            if(tag == DCA[index][i].tag && DCA[index][i].valid == 1)
+            {
+                DMEM[PPN].last_cycle_used=cycle;
+                for(j=0; j<DCA_associate; j++)
+                {
+                    if(DCA[index][j].MRU==0 && j!=i)
+                    {
+
+                        if(flag==0)
+                        {
+                            flag=1;
+                        }
+                        else
+                        {
+                            flag=2;
+                            break;
+                        }
+                    }
+                }
+                if(flag==1)
+                {
+                    for(j=0; j<DCA_associate; j++)
+                    {
+                        DCA[index][j].MRU=0;
+                    }
+                }
+                DCA[index][i].MRU=1;
+                return 1;
+            }
         }
     }
     return -1;
@@ -652,7 +744,7 @@ void checkDmemory(int VA)
         dTLBmiss++;
         DPPN=findDPT(DVPN);
 
-       if(DPPN==-1)      ///PT miss
+        if(DPPN==-1)      ///PT miss
         {
             dPTmiss++;
             DPTmiss(DVPN);
