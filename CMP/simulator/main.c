@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "function.h"
 #include "Memory.h"
@@ -32,15 +33,42 @@ extern int dPThit;
 extern int dCAmiss;
 extern int dCAhit;
 
-int main(void)
+int command[15];
+
+int main(int argc, char* argv[])
 {
     iimage = fopen("./iimage.bin","rb");
     dimage = fopen("./dimage.bin","rb");
     snapshot = fopen("./snapshot.rpt","w");
     report = fopen("./report.rpt","w");
+    if(argc==11)
+    {
+        command[1]=atoi(argv[1]);
+        command[2]=atoi(argv[2]);
+        command[3]=atoi(argv[3]);
+        command[4]=atoi(argv[4]);
+        command[5]=atoi(argv[5]);
+        command[6]=atoi(argv[6]);
+        command[7]=atoi(argv[7]);
+        command[8]=atoi(argv[8]);
+        command[9]=atoi(argv[9]);
+        command[10]=atoi(argv[10]);
+    }else
+    {
+        command[1]=64;
+        command[2]=32;
+        command[3]=8;
+        command[4]=16;
+        command[5]=16;
+        command[6]=4;
+        command[7]=4;
+        command[8]=16;
+        command[9]=4;
+        command[10]=1;
+    }
 
-    initICMP();
-    initDCMP();
+    initICMP(command[1],command[3],command[5],command[6],command[7]);
+    initDCMP(command[2],command[4],command[8],command[9],command[10]);
 
     int sdata=0,sins=0;
     int i,j;

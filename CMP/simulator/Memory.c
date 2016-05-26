@@ -36,15 +36,15 @@ MEM_block *IMEM,*DMEM;
 
 
 /////////////////////////////////INSTRUCTION////////////////////////
-void initICMP()
+void initICMP(int a,int b,int c,int d,int e)
 {
     int i=0,j=0;
-    Ipage_size=8;
+    Ipage_size=b;
     Idisk_size=1024;
-    ICA_size=16;
-    ICA_associate=4;
-    Iblock_size=4;
-    IMEM_size=64;
+    ICA_size=c;
+    ICA_associate=e;
+    Iblock_size=d;
+    IMEM_size=a;
 
 
     IPT_entries = Idisk_size/Ipage_size;
@@ -114,7 +114,7 @@ int findIPT(int VPN)
 {
     if(IPT[VPN].valid==1)
     {
-        IMEM[IPT[VPN].PPN].last_cycle_used=cycle;
+       // IMEM[IPT[VPN].PPN].last_cycle_used=cycle;
         return IPT[VPN].PPN;
     }
     else
@@ -176,7 +176,7 @@ void IPTmiss(int VPN)
 
 
 
-        for(j=0; j<Ipage_size; j+=4)
+        for(j=0; j<Ipage_size; j++)
         {
             int PA = PPN * Ipage_size + j;
             int PAB = PA / Iblock_size;
@@ -416,15 +416,15 @@ void checkImemory(int VA)
 
 ////////////////////////////////DATA//////////////////////
 
-void initDCMP()
+void initDCMP(int a,int b,int c,int d,int e)
 {
     int i=0,j=0;
-    Dpage_size=16;
+    Dpage_size=b;
     Ddisk_size=1024;
-    DCA_size=16;
-    DCA_associate=1;
-    Dblock_size=4;
-    DMEM_size=32;
+    DCA_size=c;
+    DCA_associate=e;
+    Dblock_size=d;
+    DMEM_size=a;
 
 
     DPT_entries = Ddisk_size/Dpage_size;
@@ -491,7 +491,7 @@ int findDPT(int VPN)
 {
     if(DPT[VPN].valid==1)
     {
-        DMEM[DPT[VPN].PPN].last_cycle_used=cycle;///here
+        //DMEM[DPT[VPN].PPN].last_cycle_used=cycle;///here
         return DPT[VPN].PPN;
     }
     else
@@ -554,7 +554,7 @@ void DPTmiss(int VPN)
 
 
 
-        for(j=0; j<Dpage_size; j+=4)
+        for(j=0; j<Dpage_size; j++)
         {
             int PA = PPN * Dpage_size + j;
             int PAB = PA / Dblock_size;

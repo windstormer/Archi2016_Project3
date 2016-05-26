@@ -4,8 +4,8 @@
 
 void checkDmemory(int VA);
 void checkImemory(int VA);
-void initICMP();
-void initDCMP();
+void initICMP(int a,int b,int c,int d,int e);
+void initDCMP(int a,int b,int c,int d,int e);
 int findITLB(int VPN);
 int findIPT(int VPN);
 void IPTmiss(int VPN);
