@@ -114,7 +114,7 @@ int findIPT(int VPN)
 {
     if(IPT[VPN].valid==1)
     {
-        // IMEM[IPT[VPN].PPN].last_cycle_used=cycle;
+         IMEM[IPT[VPN].PPN].last_cycle_used=cycle;
         return IPT[VPN].PPN;
     }
     else
@@ -520,7 +520,7 @@ int findDPT(int VPN)
 {
     if(DPT[VPN].valid==1)
     {
-        //DMEM[DPT[VPN].PPN].last_cycle_used=cycle;///here
+        DMEM[DPT[VPN].PPN].last_cycle_used=cycle;///here
         return DPT[VPN].PPN;
     }
     else
