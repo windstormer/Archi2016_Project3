@@ -114,7 +114,7 @@ int findIPT(int VPN)
 {
     if(IPT[VPN].valid==1)
     {
-       // IMEM[IPT[VPN].PPN].last_cycle_used=cycle;
+        // IMEM[IPT[VPN].PPN].last_cycle_used=cycle;
         return IPT[VPN].PPN;
     }
     else
@@ -330,6 +330,8 @@ void ICAmiss(int PPN)
     int tag = PAB / ICA_entries;
     int flag=0;
     int put;
+    int one=0;
+    int flags=0;
 
     if(ICA_associate==1)
     {
@@ -341,12 +343,21 @@ void ICAmiss(int PPN)
     {
         for(i=0; i<ICA_associate; i++)
         {
+            if(ICA[index][i].valid==0)
+            {
+                put =i;
+                flags=1;
+                break;
+            }
+        }
+        for(i=0; i<ICA_associate; i++)
+        {
             if(ICA[index][i].MRU==0)
             {
 
                 if(flag==0)
                 {
-                    put = i;
+                    one = i;
                     flag=1;
                 }
                 else
@@ -356,18 +367,36 @@ void ICAmiss(int PPN)
                 }
             }
         }
-        if(flag==1)
+
+        if(flags==1)
         {
-            for(i=0; i<ICA_associate; i++)
+            if(flag==1 && put==one)
             {
-                ICA[index][i].MRU=0;
+                for(i=0; i<ICA_associate; i++)
+                {
+                    ICA[index][i].MRU=0;
+                }
             }
+            ICA[index][put].MRU=1;
+            ICA[index][put].tag=tag;
+            ICA[index][put].valid=1;
         }
-        ICA[index][put].MRU=1;
-        ICA[index][put].tag=tag;
-        ICA[index][put].valid=1;
+        else
+        {
+            if(flag==1 )
+            {
+                for(i=0; i<ICA_associate; i++)
+                {
+                    ICA[index][i].MRU=0;
+                }
+            }
+            ICA[index][one].MRU=1;
+            ICA[index][one].tag=tag;
+            ICA[index][one].valid=1;
+        }
+
     }
-   // IMEM[PPN].last_cycle_used=cycle;
+    // IMEM[PPN].last_cycle_used=cycle;
 
 
 }
@@ -709,6 +738,8 @@ void DCAmiss(int PPN)
     int tag = PAB / DCA_entries;
     int flag=0;
     int put;
+    int flags=0;
+    int one=0;
     if(DCA_associate==1)
     {
         DCA[index][0].MRU=0;
@@ -719,12 +750,21 @@ void DCAmiss(int PPN)
     {
         for(i=0; i<DCA_associate; i++)
         {
+            if(DCA[index][i].valid==0)
+            {
+                put =i;
+                flags=1;
+                break;
+            }
+        }
+        for(i=0; i<DCA_associate; i++)
+        {
             if(DCA[index][i].MRU==0)
             {
 
                 if(flag==0)
                 {
-                    put = i;
+                    one = i;
                     flag=1;
                 }
                 else
@@ -734,19 +774,36 @@ void DCAmiss(int PPN)
                 }
             }
         }
-        if(flag==1)
+
+        if(flags==1)
         {
-            for(i=0; i<DCA_associate; i++)
+            if(flag==1 && put==one)
             {
-                DCA[index][i].MRU=0;
+                for(i=0; i<DCA_associate; i++)
+                {
+                    DCA[index][i].MRU=0;
+                }
             }
+            DCA[index][put].MRU=1;
+            DCA[index][put].tag=tag;
+            DCA[index][put].valid=1;
         }
-        DCA[index][put].MRU=1;
-        DCA[index][put].tag=tag;
-        DCA[index][put].valid=1;
+        else
+        {
+            if(flag==1 )
+            {
+                for(i=0; i<DCA_associate; i++)
+                {
+                    DCA[index][i].MRU=0;
+                }
+            }
+            DCA[index][one].MRU=1;
+            DCA[index][one].tag=tag;
+            DCA[index][one].valid=1;
+        }
     }
 
-   // DMEM[PPN].last_cycle_used=cycle;
+    // DMEM[PPN].last_cycle_used=cycle;
 
 }
 

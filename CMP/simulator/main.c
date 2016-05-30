@@ -168,6 +168,7 @@ int main(int argc, char* argv[])
             fprintf(snapshot,"$%02d: 0x%08X\n",j,reg[j]);
         }
         fprintf(snapshot,"PC: 0x%08X\n",PC);
+
         checkImemory(PC);
 
         if(PC>=PC_start)
